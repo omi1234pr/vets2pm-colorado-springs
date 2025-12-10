@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vets2PM Colorado Springs - AI Smart Dashboard</title>
+    <style>
+        :root {
+            --primary: #003366; /* Navy Blue */
+            --secondary: #D4AF37; /* Gold */
+            --accent: #4CAF50; /* Green for ROI */
+            --bg: #f4f4f9;
+            --text: #333;
+            --card-bg: #ffffff;
+            --ai-color: #673ab7; /* Purple for AI features */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .dashboard {
+            width: 1000px;
+            background: var(--card-bg);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 40px;
+            border-radius: 8px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: auto auto auto auto; /* Added row for AI */
+            gap: 20px;
+        }
+
+        /* Header */
+        .header {
+            grid-column: 1 / -1;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 20px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: var(--primary);
+            margin: 0;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .header h2 {
+            color: #666;
+            margin: 5px 0 0 0;
+            font-weight: 400;
+        }
+
+        .status-badge {
+            background: var(--accent);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        /* Metrics */
+        .metric-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 5px solid var(--primary);
+        }
+
+        .metric-card.roi {
+            border-left: 5px solid var(--accent);
+            background: #e8f5e9;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+        
+        .metric-label {
+            font-size: 0.9rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Charts */
+        .chart-container {
+            background: white;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .chart-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--primary);
+            width: 100%;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        /* Pie Chart */
+        .pie-chart {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: conic-gradient(
+                var(--primary) 0% 42%, 
+                var(--secondary) 42% 68%, 
+                #888 68% 89%, 
+                #aaa 89% 100%
+            );
+        }
+        .pie-legend {
+            margin-top: 15px;
+            font-size: 0.8rem;
+            width: 100%;
+        }
+        .legend-item { display: flex; justify-content: space-between; margin-bottom: 4px;}
+        .color-box { width: 12px; height: 12px; display: inline-block; margin-right: 5px; }
+
+        /* SVG Chart */
+        .svg-chart { width: 100%; height: 150px; }
+
+        /* Comp Bar */
+        .comp-bar-container {
+            width: 100%;
+            display: flex;
+            align-items: flex-end;
+            height: 120px;
+            justify-content: center;
+            gap: 40px;
+        }
+        .comp-bar {
+            width: 60px;
+            background: var(--primary);
+            color: white;
+            text-align: center;
+            font-size: 0.8rem;
+            border-radius: 4px 4px 0 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding-bottom: 5px;
+        }
+        .comp-bar.benefit { background: var(--accent); }
+
+        /* Strategy Footer */
+        .strategy-section {
+            grid-column: 1 / -1;
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-around;
+        }
+        .strategy-item {
+            text-align: center;
+            flex: 1;
+            border-right: 1px solid rgba(255,255,255,0.2);
+        }
+        .strategy-item:last-child { border-right: none; }
+        .strategy-item h3 { margin: 0 0 5px 0; color: var(--secondary); }
+        .strategy-item p { margin: 0; font-size: 0.9rem; opacity: 0.9; }
+
+        /* --- AI Section Styling --- */
+        .ai-section {
+            grid-column: 1 / -1;
+            background: #f3e5f5; /* Light purple bg */
+            border: 1px solid #d1c4e9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .ai-tool {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ai-tool h3 {
+            color: var(--ai-color);
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ai-btn {
+            background: var(--ai-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .ai-btn:hover { background: #512da8; }
+        .ai-btn:disabled { background: #b39ddb; cursor: not-allowed; }
+
+        .ai-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-family: inherit;
+            box-sizing: border-box; 
+        }
+
+        .ai-output {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fafafa;
+            border-left: 3px solid var(--ai-color);
+            font-size: 0.9rem;
+            min-height: 60px;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--ai-color);
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    </style>
+</head>
+<body>
+
+    <div class="dashboard">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1>Vets2PM Colorado Springs</h1>
+                <h2>Strategic Investment & Benefit Realization</h2>
+            </div>
+            <div class="status-badge">Business Case v1.0</div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="metric-card">
+            <div class="metric-label">Program Cost</div>
+            <div class="metric-value">$9,500</div>
+            <small>Corrected Baseline</small>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Projected Benefits</div>
+            <div class="metric-value">$25,000</div>
+            <small>Year 1 Outcomes</small>
+        </div>
+        <div class="metric-card roi">
+            <div class="metric-label">Return on Investment</div>
+            <div class="metric-value" style="color: var(--accent);">163%</div>
+            <small>High Impact / Low Risk</small>
+        </div>
+
+        <!-- Chart: Cost Breakdown -->
+        <div class="chart-container">
+            <div class="chart-title">Investment Breakdown</div>
+            <div class="pie-chart"></div>
+            <div class="pie-legend">
+                <div class="legend-item"><span style="display:flex; align-items:center;"><span class="color-box" style="background:var(--primary)"></span>Training (42%)</span> <span>$4,000</span></div>
+                <div class="legend-item"><span style="display:flex; align-items:center;"><span class="color-box" style="background:var(--secondary)"></span>Materials (26%)</span> <span>$2,500</span></div>
+                <div class="legend-item"><span style="display:flex; align-items:center;"><span class="color-box" style="background:#888"></span>Ops (21%)</span> <span>$2,000</span></div>
+                <div class="legend-item"><span style="display:flex; align-items:center;"><span class="color-box" style="background:#aaa"></span>Marketing (11%)</span> <span>$1,000</span></div>
+            </div>
+        </div>
+
+        <!-- Chart: Cost vs Benefit -->
+        <div class="chart-container">
+            <div class="chart-title">Cost vs. Benefit</div>
+            <div class="comp-bar-container">
+                <div class="comp-bar" style="height: 38%;">
+                    $9.5k<br><span style="font-size:0.7rem; opacity:0.8;">Cost</span>
+                </div>
+                <div class="comp-bar benefit" style="height: 100%;">
+                    $25k<br><span style="font-size:0.7rem; opacity:0.8;">Benefit</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart: Realization Timeline -->
+        <div class="chart-container">
+            <div class="chart-title">Benefit Realization (Cumulative)</div>
+            <svg class="svg-chart" viewBox="0 0 200 120">
+                <line x1="20" y1="100" x2="190" y2="100" stroke="#eee" stroke-width="1"/>
+                <line x1="20" y1="20" x2="190" y2="20" stroke="#eee" stroke-width="1"/>
+                <line x1="20" y1="70" x2="190" y2="70" stroke="#d9534f" stroke-width="1" stroke-dasharray="4"/>
+                <text x="25" y="65" font-size="8" fill="#d9534f">Break-even ($9.5k)</text>
+                <polyline points="30,100 70,85 110,70 150,45 190,20" fill="none" stroke="var(--accent)" stroke-width="3"/>
+                <circle cx="30" cy="100" r="3" fill="var(--primary)"/>
+                <circle cx="70" cy="85" r="3" fill="var(--primary)"/>
+                <circle cx="110" cy="70" r="3" fill="var(--primary)"/>
+                <circle cx="150" cy="45" r="3" fill="var(--primary)"/>
+                <circle cx="190" cy="20" r="3" fill="var(--primary)"/>
+                <text x="30" y="115" font-size="8" text-anchor="middle">Start</text>
+                <text x="70" y="115" font-size="8" text-anchor="middle">Q1</text>
+                <text x="110" y="115" font-size="8" text-anchor="middle">Q2</text>
+                <text x="150" y="115" font-size="8" text-anchor="middle">Q3</text>
+                <text x="190" y="115" font-size="8" text-anchor="middle">Q4</text>
+            </svg>
+        </div>
+
+        <!-- AI Operations Center -->
+        <div class="ai-section">
+            
+            <!-- Tool 1: Executive Analyst -->
+            <div class="ai-tool">
+                <h3>✨ AI Strategic Analyst</h3>
+                <p style="font-size:0.9rem; color:#666; margin-bottom:15px;">
+                    Generate an instant executive summary based on live dashboard metrics ($9,500 Cost / $25,000 Benefit).
+                </p>
+                <button class="ai-btn" onclick="generateAnalysis()">
+                    <span id="analysis-loader" class="loader"></span>
+                    <span>Generate Executive Brief</span>
+                </button>
+                <div id="analysis-output" class="ai-output" style="display:none;"></div>
+            </div>
+
+            <!-- Tool 2: Military Translator -->
+            <div class="ai-tool">
+                <h3>✨ Military-to-PM Translator</h3>
+                <p style="font-size:0.9rem; color:#666; margin-bottom:15px;">
+                    Enter a military job description to translate it into Project Management (PMP) resume bullet points.
+                </p>
+                <textarea id="mos-input" class="ai-input" rows="3" placeholder="e.g. Infantry Squad Leader, responsible for equipment accountability and training 9 soldiers..."></textarea>
+                <button class="ai-btn" onclick="translateSkill()">
+                    <span id="translator-loader" class="loader"></span>
+                    <span>Translate to Civilian PM</span>
+                </button>
+                <div id="translator-output" class="ai-output" style="display:none;"></div>
+            </div>
+
+        </div>
+
+        <!-- Strategic Footer -->
+        <div class="strategy-section">
+            <div class="strategy-item">
+                <h3>Employment</h3>
+                <p>Placement in PM roles</p>
+            </div>
+            <div class="strategy-item">
+                <h3>Certification</h3>
+                <p>PMP, Agile & Scrum</p>
+            </div>
+            <div class="strategy-item">
+                <h3>Community</h3>
+                <p>Stronger local workforce</p>
+            </div>
+            <div class="strategy-item">
+                <h3>Sustainability</h3>
+                <p>Long-term partnerships</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // API Configuration
+        const apiKey = ""; // API Key provided by environment
+
+        async function callGemini(prompt) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{
+                    parts: [{ text: prompt }]
+                }]
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data.candidates[0].content.parts[0].text;
+            } catch (error) {
+                console.error("Gemini API Error:", error);
+                return "Error connecting to AI service. Please try again.";
+            }
+        }
+
+        // Feature 1: Executive Analysis
+        async function generateAnalysis() {
+            const outputDiv = document.getElementById('analysis-output');
+            const loader = document.getElementById('analysis-loader');
+            const btnText = loader.nextElementSibling;
+
+            // UI Loading State
+            outputDiv.style.display = 'block';
+            outputDiv.textContent = "";
+            loader.style.display = 'inline-block';
+            btnText.textContent = "Analyzing...";
+
+            const prompt = `
+                Act as a Senior Program Manager. Analyze the following business case data for the "Vets2PM Colorado Springs" program:
+                - Cost: $9,500 (Breakdown: 42% Training, 26% Materials, 21% Ops, 11% Marketing)
+                - Projected Benefits (Year 1): $25,000
+                - ROI: 163%
+                - Goal: Train veterans in PMP/Agile and place them in jobs.
+
+                Please provide a concise Executive Summary (max 3 sentences) and 3 strategic bullet points on how to maximize this ROI further.
+                Tone: Professional, persuasive, and encouraging.
+            `;
+
+            try {
+                const result = await callGemini(prompt);
+                outputDiv.innerText = result;
+            } catch (e) {
+                outputDiv.innerText = "Failed to generate analysis.";
+            } finally {
+                loader.style.display = 'none';
+                btnText.textContent = "Regenerate Executive Brief";
+            }
+        }
+
+        // Feature 2: Skill Translator
+        async function translateSkill() {
+            const inputVal = document.getElementById('mos-input').value;
+            const outputDiv = document.getElementById('translator-output');
+            const loader = document.getElementById('translator-loader');
+            const btnText = loader.nextElementSibling;
+
+            if (!inputVal.trim()) {
+                outputDiv.style.display = 'block';
+                outputDiv.innerText = "Please enter a military job description first.";
+                return;
+            }
+
+            // UI Loading State
+            outputDiv.style.display = 'block';
+            outputDiv.textContent = "";
+            loader.style.display = 'inline-block';
+            btnText.textContent = "Translating...";
+
+            const prompt = `
+                Act as a Resume Expert for Veterans. Convert the following military job description into 3 "Project Management Professional (PMP)" aligned resume bullet points. 
+                Use PMP terminology like "stakeholder management," "risk mitigation," "agile execution," and "resource allocation."
+                
+                Military Description: "${inputVal}"
+            `;
+
+            try {
+                const result = await callGemini(prompt);
+                outputDiv.innerText = result;
+            } catch (e) {
+                outputDiv.innerText = "Failed to translate skills.";
+            } finally {
+                loader.style.display = 'none';
+                btnText.textContent = "Translate to Civilian PM";
+            }
+        }
+    </script>
+
+</body>
+</html>
